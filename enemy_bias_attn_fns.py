@@ -5,6 +5,7 @@ def attention_numerical_toward_combatant(combatant_name):
         Return:
             attentiveness_score(float): a score of how attentive the user is
     """
+    # TODO: based on the metrics we determine
     return attentiveness_score
 
 
@@ -16,7 +17,7 @@ def attention_toward_combatant(combatant_name,
         Args:
             combatant_name(str): the name of the combatant
         Return:
-            a general attentiion score from low, neutral and high
+            a general attention score from low, neutral and high
     """
     if attentiveness_score < neutral_attn_threshold:
         return "low_attention"
@@ -40,3 +41,17 @@ def attention_bool_toward_combatant(combatant_name,
     if attentiveness_score < is_attentive_threshold:
         return False
     return True
+
+
+def relative_attention_across_combatants(combatant_name_1, combatant_name_2):
+    """Determines if a user has a bias between the two combatants
+        Args:
+            combatant_name_1(str): the name of one combatant
+            combatant_name_2(str): the name of the other combatant
+        Return:
+            a user's relative attentiveness towards the two combatants
+    """
+    combatant_1_attention = attention_toward_combatant(combatant_name_1)
+    combatant_2_attention = attention_toward_combatant(combatant_name_2)
+    return [(combatant_name_1, combatant_1_attention), (combatant_name_2,combatant_2_attention)]
+
