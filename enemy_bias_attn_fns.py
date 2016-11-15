@@ -168,8 +168,12 @@ class Bias_Nervousness_Model():
                 combatant_name(str): name of a combatant
                 user_id(int): id of the user of interest
             Return:
-                sky_environment(float): 0 is blue for and fully cloudy;
-                                        1 is yellow and fully sunny
+                sky_environment(float): continuous value between 0 and 1,
+                                        where 0 to .5 indicates opacity of the
+                                        altostratus cloud layer over the sunny
+                                        layer and .5 to 1 indicates the opacity
+                                        of the nimbostratus layer over altostratus
+                                        layer
         """
         prev_state = self.prev_states.get("user_id", 0)
         new_state = self.biased_toward_combatant(combatant_name, user_id)
@@ -181,3 +185,17 @@ class Bias_Nervousness_Model():
             return max(0, tmp - 1./15)
         return new_state
 
+    def post_epilogue_transformation_mirror(self, conflict, user_id):
+        """Indicates which combatant the user's avatar looks like at the end
+            Args:
+                conflict(str): name of a conflict
+                user_id(int): id of the user of interest
+            Return:
+                combatant_name(str): name of the combatant the user's avatar
+                                     resembles or None if the user does not
+                                     express bias towards either combatant
+        """
+        combatant_bias = self.biased_toward_either(conflict, user_id)
+        if combatant_bias not in ['both', 'either']:
+            return combatant_bias
+        return None
