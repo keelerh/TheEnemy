@@ -67,6 +67,9 @@ class Bias_Nervousness_Model():
             Return:
                 a score of how attentive the user is
         """
+        # bounds = calculate_bounds(self.user_data[user_id])
+        # self.LOWER_BOUND = bounds["lower_bound"]
+        # self.UPPER_BOUND = bounds["upper_bound"]
         # float
         percentage_looking_at_face = self.percentage_looking_at_face(combatant_name)
         # float
@@ -94,6 +97,9 @@ class Bias_Nervousness_Model():
             Return:
                 a general attention score of -1 (low), 0 (neutral) and 1 (high)
         """
+        # bounds = calculate_bounds(self.user_data[user_id])
+        # self.LOWER_BOUND = bounds["lower_bound"]
+        # self.UPPER_BOUND = bounds["upper_bound"]
         adjusted_value = self.nervous_toward_combatant(combatant_name, user_id)
         if adjusted_value < self.LOWER_BOUND:
             return -1
