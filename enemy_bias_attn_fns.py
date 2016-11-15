@@ -163,7 +163,10 @@ class Bias_Nervousness_Model():
 
 
     def sky_change_test(self, combatant_name, user_id):
-        """Determines if a user has a bias towards a given combatant
+        """Calculates the values set for cloud/brightness states such
+        that for continuous nervousness the sky goes from fully sunny
+        to fully cloudy over the course of an interaction with an individual
+        combatant (roughly 7.5 minutes)
             Args:
                 combatant_name(str): name of a combatant
                 user_id(int): id of the user of interest
@@ -185,6 +188,7 @@ class Bias_Nervousness_Model():
             return max(0, tmp - 1./15)
         return new_state
 
+
     def post_epilogue_transformation_mirror(self, conflict, user_id):
         """Indicates which combatant the user's avatar looks like at the end
             Args:
@@ -192,10 +196,14 @@ class Bias_Nervousness_Model():
                 user_id(int): id of the user of interest
             Return:
                 combatant_name(str): name of the combatant the user's avatar
-                                     resembles or None if the user does not
-                                     express bias towards either combatant
+                                     resembles (i.e. the combatant the user
+                                     expressed more bias towards); if the scores
+                                     are identical aribitrarily returns the second
+                                     comabatant
         """
-        combatant_bias = self.biased_toward_either(conflict, user_id)
-        if combatant_bias not in ['both', 'either']:
-            return combatant_bias
-        return None
+        (combatant_1, combatant_2) = conflict.combatants
+        combatant_1_bias = nervous_toward_combatant_score(combatant_1, user_id)
+        combatant_2_bias = nervous_toward_combatant_score(combatant_2, user_id)
+        if combatant_1_bias > combatant_2_bias:
+            return combatant_1
+        return combatant_2
