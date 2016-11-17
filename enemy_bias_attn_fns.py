@@ -10,6 +10,7 @@ class Bias_Nervousness_Model():
     def __init__(self, user_data):
         self.user_data = user_data  # includes angular stillness, stillness, and mean distance
         self.prev_states = {}
+        self.bias_per_conflict = {"C1": [], "C2": [], "C3": []}
         bounds = self.calculate_bounds(user_data)
         self.LOWER_BOUND = bounds["lower_bound"]
         self.UPPER_BOUND = bounds["upper_bound"]
@@ -57,9 +58,31 @@ class Bias_Nervousness_Model():
         pass
 
 
+    def nervous_toward_combatant_score(self, combatant_name, user_id):
+        """Calculates a value representing the attention paid towards a given
+           combatant which is taken to represent a user's nervousness where 0
+           is neutral, -1 is low nervousness, and 1 is high nervousness
+            Args:
+                combatant_name(str): name of the combatant calculating nervouseness
+                                     towards
+                user_id(int): id of the user of interest
+            Return:
+                a general attention score of -1 (low), 0 (neutral) and 1 (high)
+        """
+        # bounds = calculate_bounds(self.user_data[user_id])
+        # self.LOWER_BOUND = bounds["lower_bound"]
+        # self.UPPER_BOUND = bounds["upper_bound"]
+        adjusted_value = self.nervous_toward_combatant(combatant_name, user_id)
+        if adjusted_value < self.LOWER_BOUND:
+            return -1
+        elif adjusted_value < self.UPPER_BOUND:
+            return 0
+        return 1
+
+
     def nervous_toward_combatant(self, combatant_name, user_id):
         """Calculates a score representing the attention paid towards a given
-           combatant which is taken to represent a user's nervousness
+           combatant which is taken to represent a users nervousness
             Args:
                 combatant_name(str): name of the combatant calculating nervouseness
                                      towards
@@ -86,26 +109,43 @@ class Bias_Nervousness_Model():
             return attentiveness_value
 
 
-    def nervous_toward_combatant_score(self, combatant_name, user_id):
-        """Calculates a value representing the attention paid towards a given
-           combatant which is taken to represent a user's nervousness where 0
-           is neutral, -1 is low nervousness, and 1 is high nervousness
+    def nervous_toward_combatant_web_reg(self, combatant_name, user_id):
+        """Calculates a score representing the attention paid towards a given
+           combatant which is taken to represent a user's nervousness,
+           considering both the user data collected during the experience and
+           the data from the pre-experience survey
             Args:
                 combatant_name(str): name of the combatant calculating nervouseness
                                      towards
                 user_id(int): id of the user of interest
             Return:
-                a general attention score of -1 (low), 0 (neutral) and 1 (high)
+                a score of how attentive the user is
         """
-        # bounds = calculate_bounds(self.user_data[user_id])
-        # self.LOWER_BOUND = bounds["lower_bound"]
-        # self.UPPER_BOUND = bounds["upper_bound"]
-        adjusted_value = self.nervous_toward_combatant(combatant_name, user_id)
-        if adjusted_value < self.LOWER_BOUND:
-            return -1
-        elif adjusted_value < self.UPPER_BOUND:
-            return 0
-        return 1
+        conflict = combatant_name.conflict
+        adjustment = 0
+        if self.user_data[user_id][conflict]['has_bias'] == -1:
+            adjustment = -1 * self.MEAN_STD
+        if self.user_data[user_id][conflict]['has_bias'] == -1:
+            adjustment = self.MEAN_STD
+        attentiveness_value = self.nervous_toward_combatant_score(combatant_name, user_id)
+        return attentiveness_value + adjustment
+
+
+    def bias_toward_either(self, user_id):
+        """Determines if a user is biased to either or both of the combantants in a
+        conflict, updating the bias array with the result and returning True if successful
+            Args:
+                user_id(int): id of the user of interest
+        """
+        for conflict in self.user_data[user_id].conflicts:
+            bias = self.biased_toward_which(combatant_name, user_id)
+            if bias == 'both':
+                self.bias_per_conflict[conflict].append('B')
+            elif bias == 'neither':
+                self.bias_per_conflict[conflict].append('N')
+            else:
+                self.bias_per_conflict[conflict].append(1)
+        return True
 
 
     def biased_toward_combatant(self, combatant_name, user_id):
@@ -213,3 +253,4 @@ class Bias_Nervousness_Model():
         if combatant_1_bias > combatant_2_bias:
             return combatant_1
         return combatant_2
+
