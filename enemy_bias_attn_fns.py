@@ -114,6 +114,9 @@ class Bias_Nervousness_Model():
            combatant which is taken to represent a user's nervousness,
            considering both the user data collected during the experience and
            the data from the pre-experience survey
+           Note: Questions 2 – 4 from the new Online User Registration Survey
+           should be used to determine the user’s initial bias and compared to
+           their bias in the experience
             Args:
                 combatant_name(str): name of the combatant calculating nervouseness
                                      towards
@@ -162,7 +165,7 @@ class Bias_Nervousness_Model():
         return True
 
 
-    def biased_toward_either(self, conflict, user_id):
+    def biased_toward_either_bool(self, conflict, user_id):
         """Determines if a user has a bias towards either combatant in a conflict
             Args:
                 conflict(str): name of a given conflict
